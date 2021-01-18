@@ -1,0 +1,27 @@
+
+# Images coming into and out of the main block
+
+input_elements: "input_frame"
+output_elements: "output_frame"
+
+# WebCam input 
+
+method:
+ type: "WebCam"
+
+
+block_definitions:
+ block1: 
+  adabegi: "ImageCanny"
+  input_elements: 
+   image: "gray_img"
+  output_elements:
+   image: "output_frame"
+ block2:
+  adabegi: "ImageGray"
+  input_elements: 
+   image: "input_frame"
+  output_elements:
+   image: "gray_img"
+
+

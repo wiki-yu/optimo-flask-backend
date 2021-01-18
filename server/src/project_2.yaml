@@ -1,0 +1,20 @@
+
+# Images coming into and out of the main block
+
+input_elements: "input_frame"
+output_elements: "output_frame"
+
+# WebCam input 
+
+method:
+ type: "WebCam"
+
+
+block_definitions:
+ block1: 
+  adabegi: "YoloFace"
+  input_elements: "input_frame"
+  output_elements: "output_frame"
+  model_name: "yolo_face" 
+
+

@@ -1,0 +1,89 @@
+
+# Images coming into and out of the main block
+
+input_elements: "input_frame"
+output_elements: "output_frame"
+
+# WebCam input 
+
+method:
+ type: "WebCam"
+ save_output: True
+ # output_vid_name: "output_video_CAA"
+
+
+block_definitions:
+ block1:
+  adabegi: "YoloV3"
+  input_elements: 
+   image: "input_frame"
+  output_elements: 
+   image: "obj_detected_frame"
+   boxes: "out_pred"
+  model_name: "yolo_CAA" 
+
+ block2: 
+  adabegi: "ObjectTracking"
+  input_elements: 
+   image: "obj_detected_frame"
+   boxes: "out_pred"
+  output_elements: 
+   image: "object_tracking_frame"
+   CoG: "CoG_hist"
+  initialize_variables:
+   objects_per_frame: 12
+   history_count: 15
+   CoG_name: "CoG_hist"
+   yolo_model_name: "yolo_CAA"
+   several_objects_per_frame:
+    objects: ["Hand"]
+    qty: [2]
+   reference_labels: ['Hand', 'Left_hand', 'Press', 'Press_bottom','Cotton_stick', 'Right_hand',  'Fixture2', 'Trash', 'Conveyor', 'Phone_1', 'Tweezer']
+  block_options:
+   t1never: 
+    objects: ["Tweezer"]
+   t1sometimes: 
+    objects: ["Phone_1"]
+    conditions: ["Conveyor"]
+   t1always: 
+    objects: ['Left_hand', 'Cotton_stick', 'Right_hand', 'Press', 'Press_bottom', 'Fixture2', 'Trash', 'Conveyor']
+   t2plus: 
+    objects: ['Hand']
+    conditions: [['Left_hand', 'Right_hand']]
+
+ block3:
+  adabegi: "TaskRecognition"
+  input_elements:
+   image: "object_tracking_frame"
+   CoG: "CoG_hist"
+  output_elements:
+   image: "task_frame"
+   CoG: "CoG_hist"
+  initialize_variables:
+   output_df: [True,12]
+   task_class_names: [[0,"Wait"],[1,"Move unit"],[2,"Inspect"],[5,"Press fixture button"], [6,"Press unit"], [10,"Pick/Place tool"], [11,"Slide 2 rounds inside unit"], [14,"Peel off big release liner and Throw into trash box"]]
+  model_name: "CAA_task_recognition"
+  finalize: 
+   output_df: True
+
+ block4:
+  adabegi: "TaskTracking"
+  input_elements:
+   image: "task_frame"
+   CoG: "CoG_hist"
+  output_elements:
+   image: "output_frame"
+   tracked_tasks: "checking_tasks"
+  initialize_variables:
+   max_history: 200
+   tracked_task_qty: 5
+  block_options:
+   tasks: [2,6,11,14,2]
+   task_duration: [20,150,80,45,20]
+   checked_percentage: 0.8
+   conditions: ['first','','','','plus1']
+   reset_cond: [0,16,'plus1']
+   
+
+
+
